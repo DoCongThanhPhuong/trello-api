@@ -14,11 +14,9 @@ const createNew = async (req, res, next) => {
     // Có kết quả thì trả về phía Client
     res
       .status(StatusCodes.CREATED)
-      .json({ message: 'POST from Controller: API create a new board' })
+      .json({ message: 'POST from Controller: API created a new board' })
   } catch (error) {
-    res
-      .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ errors: new Error(error).message })
+    next(error)
   }
 }
 
