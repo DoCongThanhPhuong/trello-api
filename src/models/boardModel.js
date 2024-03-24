@@ -40,7 +40,7 @@ const createNew = async (data) => {
       .collection(BOARD_COLLECTION_NAME)
       .insertOne(validData)
     return createdBoard
-    // return await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(data)
+    // return await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
   } catch (error) {
     throw new Error(error)
   }
@@ -89,7 +89,7 @@ const getDetails = async (id) => {
         }
       ])
       .toArray()
-    return result[0] || {}
+    return result[0] || null
   } catch (error) {
     throw new Error(error)
   }
