@@ -119,7 +119,6 @@ const pushColumnOrderIds = async (column) => {
   }
 }
 
-// Function có nhiệm vụ push một giá trị columnId vào cuối mảng columnOrderIds
 const update = async (boardId, updateData) => {
   // Lọc các fields không được cho phép cập nhật
   Object.keys(updateData).forEach((fieldName) => {
