@@ -82,16 +82,22 @@ const pushCardOrderIds = async (card) => {
   }
 }
 
-// Function có nhiệm vụ push một giá trị columnId vào cuối mảng columnOrderIds
 const update = async (columnId, updateData) => {
-  // Lọc các fields không được cho phép cập nhật
-  Object.keys(updateData).forEach((fieldName) => {
-    if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
-      delete updateData[fieldName]
-    }
-  })
-
   try {
+    // Lọc các fields không được cho phép cập nhật
+    Object.keys(updateData).forEach((fieldName) => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
+    })
+
+    // Đối với những dữ liệu liên quan đến ObjectId, biến đổi ở đây
+    if (updateData.cardOrderIds) {
+      updateData.cardOrderIds = updateData.cardOrderIds.map(
+        (_id) => new ObjectId(_id)
+      )
+    }
+
     const result = await GET_DB()
       .collection(COLUMN_COLLECTION_NAME)
       .findOneAndUpdate(
