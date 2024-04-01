@@ -120,14 +120,21 @@ const pushColumnOrderIds = async (column) => {
 }
 
 const update = async (boardId, updateData) => {
-  // Lọc các fields không được cho phép cập nhật
-  Object.keys(updateData).forEach((fieldName) => {
-    if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
-      delete updateData[fieldName]
-    }
-  })
-
   try {
+    // Lọc các fields không được cho phép cập nhật
+    Object.keys(updateData).forEach((fieldName) => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
+    })
+
+    // Đối với những dữ liệu liên quan đến ObjectId, biến đổi ở đây
+    if (updateData.columnOrderIds) {
+      updateData.columnOrderIds = updateData.columnOrderIds.map(
+        (_id) => new ObjectId(_id)
+      )
+    }
+
     const result = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .findOneAndUpdate(
