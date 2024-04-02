@@ -49,12 +49,12 @@ const createNew = async (data) => {
   }
 }
 
-const findOneById = async (id) => {
+const findOneById = async (boardId) => {
   try {
     const result = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .findOne({
-        _id: new ObjectId(id)
+        _id: new ObjectId(boardId)
       })
     return result
   } catch (error) {
@@ -63,14 +63,14 @@ const findOneById = async (id) => {
 }
 
 // Query tổng hợp (aggregate) để lấy toàn bộ Columns và Cards thuộc về Board
-const getDetails = async (id) => {
+const getDetails = async (boardId) => {
   try {
     const result = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .aggregate([
         {
           $match: {
-            _id: new ObjectId(id),
+            _id: new ObjectId(boardId),
             _destroy: false
           }
         },
@@ -98,7 +98,8 @@ const getDetails = async (id) => {
   }
 }
 
-// Function có nhiệm vụ push một giá trị columnId vào cuối mảng columnOrderIds
+// Đẩy một phần tử columnId vào cuối mảng columnOrderIds
+// Dùng $push trong MongoBD ở trường hợp này để đẩy một phần tử vào cuối mảng
 const pushColumnOrderIds = async (column) => {
   try {
     const result = await GET_DB()
@@ -109,6 +110,28 @@ const pushColumnOrderIds = async (column) => {
         },
         {
           $push: { columnOrderIds: new ObjectId(column._id) }
+        },
+        { returnDocument: 'after' }
+      )
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+// Lấy một phần tử columnId ra khỏi mảng columnOrderIds
+// Dùng $pull trong MongoBD ở trường hợp này để lấy một phần tử ra khỏi mảng rồi xóa nó đi
+const pullColumnOrderIds = async (column) => {
+  try {
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          _id: new ObjectId(column.boardId)
+        },
+        {
+          $pull: { columnOrderIds: new ObjectId(column._id) }
         },
         { returnDocument: 'after' }
       )
@@ -160,5 +183,6 @@ export const boardModel = {
   findOneById,
   getDetails,
   pushColumnOrderIds,
+  pullColumnOrderIds,
   update
 }
