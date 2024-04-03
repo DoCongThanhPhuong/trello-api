@@ -23,11 +23,21 @@ const START_SERVER = () => {
   // Middleware xử lý lỗi tập trung
   app.use(errorHandlingMiddleware)
 
-  app.listen(env.APP_PORT, env.APP_HOST, () => {
-    console.log(
-      `3. Hello ${env.AUTHOR}, Back-end server is running successfully at Host: ${env.APP_HOST} and Port: ${env.APP_PORT}`
-    )
-  })
+  if (env.BUILD_MODE === 'production') {
+    // Môi trường Production
+    app.listen(process.env.PORT, () => {
+      console.log(
+        `3. Production: Hello ${env.AUTHOR}, Back-end server is running successfully at Port: ${process.env.PORT}`
+      )
+    })
+  } else {
+    // Môi trường local DEV
+    app.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
+      console.log(
+        `3. Local DEV: Hello ${env.AUTHOR}, Back-end server is running successfully at Host: ${env.LOCAL_DEV_APP_HOST} and Port: ${env.LOCAL_DEV_APP_PORT}`
+      )
+    })
+  }
 
   // Thực hiện các tác vụ cleanup trước khi dừng server
   exitHook(() => {
