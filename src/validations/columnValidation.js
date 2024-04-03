@@ -9,7 +9,7 @@ const createNew = async (req, res, next) => {
       .required()
       .pattern(OBJECT_ID_RULE)
       .message(OBJECT_ID_RULE_MESSAGE),
-    title: Joi.string().required().min(3).max(50).trim().strict()
+    title: Joi.string().required().min(1).max(50).trim().strict()
   })
 
   try {
@@ -28,7 +28,7 @@ const update = async (req, res, next) => {
     // boardId: Joi.string()
     //   .pattern(OBJECT_ID_RULE)
     //   .message(OBJECT_ID_RULE_MESSAGE),
-    title: Joi.string().min(3).max(50).trim().strict(),
+    title: Joi.string().min(1).max(50).trim().strict(),
     cardOrderIds: Joi.array().items(
       Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
     )
