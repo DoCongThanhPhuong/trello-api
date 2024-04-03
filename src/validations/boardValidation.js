@@ -8,7 +8,7 @@ const createNew = async (req, res, next) => {
   // Back-end bắt buộc phải validate dữ liệu
   // Thông thường dữ liệu sẽ được validate ở cả FE và BE
   const correctCondition = Joi.object({
-    title: Joi.string().required().min(3).max(50).trim().strict().messages({
+    title: Joi.string().required().min(1).max(50).trim().strict().messages({
       // Custom error messages với Joi
       'any.required': 'Title is required',
       'string.empty': 'Title is not allowed to be empty',
@@ -42,7 +42,7 @@ const createNew = async (req, res, next) => {
 const update = async (req, res, next) => {
   const correctCondition = Joi.object({
     // Lưu ý: Không dùng required() trong trường hợp update
-    title: Joi.string().min(3).max(50).trim().strict(),
+    title: Joi.string().min(1).max(50).trim().strict(),
     description: Joi.string().min(3).max(255).trim().strict(),
     type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE),
     columnOrderIds: Joi.array().items(
