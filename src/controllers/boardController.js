@@ -49,9 +49,20 @@ const moveCardToDifferentColumn = async (req, res, next) => {
   }
 }
 
+const getListByUserId = async (req, res, next) => {
+  try {
+    const userId = req.params.userId
+    const listBoard = await boardService.getListByUserId(userId)
+    res.status(StatusCodes.OK).json(listBoard)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const boardController = {
   createNew,
   getDetails,
   update,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  getListByUserId
 }
