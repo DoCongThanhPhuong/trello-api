@@ -49,6 +49,15 @@ const createNew = async (data) => {
   try {
     const validData = await validateBeforeCreating(data)
 
+    // Đối với những dữ liệu liên quan đến ObjectId, biến đổi ở đây
+    if (validData.ownerIds) {
+      validData.ownerIds = validData.ownerIds.map((_id) => new ObjectId(_id))
+    }
+
+    if (validData.memberIds) {
+      validData.memberIds = validData.memberIds.map((_id) => new ObjectId(_id))
+    }
+
     const createdBoard = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .insertOne(validData)
