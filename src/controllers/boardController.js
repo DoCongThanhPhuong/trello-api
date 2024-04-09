@@ -3,17 +3,11 @@ import { boardService } from '~/services/boardService'
 
 const createNew = async (req, res, next) => {
   try {
-    // console.log('req.body:', req.body)
-    // console.log('req.query:', req.query)
-    // console.log('req.params:', req.params)
-    // console.log('req.files:', req.files)
-    // console.log('req.cookies:', req.cookies)
-    // console.log('req.jwtDecoded:', req.jwtDecoded)
-
-    // Điều hướng dữ liệu sang tầng Service
-    const createdBoard = await boardService.createNew(req.body)
-
-    // Có kết quả thì trả về phía Client
+    const createdBoard = await boardService.createNew({
+      ...req.body,
+      ownerIds: [res.locals.uid],
+      memberIds: [res.locals.uid]
+    })
     res.status(StatusCodes.CREATED).json(createdBoard)
   } catch (error) {
     next(error)
@@ -22,7 +16,7 @@ const createNew = async (req, res, next) => {
 
 const getDetails = async (req, res, next) => {
   try {
-    const boardId = req.params.id
+    const boardId = req.params.boardId
     const board = await boardService.getDetails(boardId)
     res.status(StatusCodes.OK).json(board)
   } catch (error) {
@@ -32,7 +26,7 @@ const getDetails = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const boardId = req.params.id
+    const boardId = req.params.boardId
     const updatedBoard = await boardService.update(boardId, req.body)
     res.status(StatusCodes.OK).json(updatedBoard)
   } catch (error) {
@@ -51,9 +45,9 @@ const moveCardToDifferentColumn = async (req, res, next) => {
 
 const getListByUserId = async (req, res, next) => {
   try {
-    const userId = req.params.userId
-    const listBoard = await boardService.getListByUserId(userId)
-    res.status(StatusCodes.OK).json(listBoard)
+    const userId = res.locals.uid
+    const boardsList = await boardService.getListByUserId(userId)
+    res.status(StatusCodes.OK).json(boardsList)
   } catch (error) {
     next(error)
   }

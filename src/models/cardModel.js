@@ -1,7 +1,7 @@
 import Joi from 'joi'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 // Define Collection (name & schema)
 const CARD_COLLECTION_NAME = 'cards'
@@ -14,12 +14,34 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
     .required()
     .pattern(OBJECT_ID_RULE)
     .message(OBJECT_ID_RULE_MESSAGE),
-
-  title: Joi.string().required().min(1).max(50).trim().strict(),
-  description: Joi.string().optional(),
-
+  title: Joi.string().required().min(1).max(50).trim(),
+  description: Joi.string().optional().min(3).max(255).trim(),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
+  cover: Joi.string().uri().default(null),
+  memberIds: Joi.array().items(Joi.string()).default([]),
+  comments: Joi.array()
+    .items(
+      Joi.object({
+        userId: Joi.string().required(),
+        userEmail: Joi.string().required().email(),
+        userAvatar: Joi.string().required().uri(),
+        userDisplayName: Joi.string().required(),
+        content: Joi.string().required().min(1).max(500).trim(),
+        createdAt: Joi.date().timestamp('javascript').default(Date.now())
+      })
+    )
+    .default([]),
+  attachments: Joi.array()
+    .items(
+      Joi.object({
+        fileName: Joi.string(),
+        fileType: Joi.string(),
+        fileURL: Joi.string().uri(),
+        createdAt: Joi.date().timestamp('javascript').default(Date.now())
+      })
+    )
+    .default([]),
   _destroy: Joi.boolean().default(false)
 })
 
@@ -109,11 +131,33 @@ const deleteManyByColumnId = async (columnId) => {
   }
 }
 
+const destroyManyByColumnId = async (columnId) => {
+  try {
+    const result = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .updateMany(
+        { columnId: new ObjectId(columnId) },
+        {
+          $set: {
+            _destroy: true,
+            updatedAt: Date.now()
+          }
+        }
+      )
+
+    // console.log('🚀 ~ deleteManyByColumnId ~ result:', result)
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNew,
   findOneById,
   update,
-  deleteManyByColumnId
+  deleteManyByColumnId,
+  destroyManyByColumnId
 }

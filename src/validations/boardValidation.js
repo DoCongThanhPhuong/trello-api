@@ -1,42 +1,27 @@
-import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
+import Joi from 'joi'
 import ApiError from '~/utils/ApiError'
 import { BOARD_TYPES } from '~/utils/constants'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
-  // Back-end bắt buộc phải validate dữ liệu
-  // Thông thường dữ liệu sẽ được validate ở cả FE và BE
   const correctCondition = Joi.object({
-    title: Joi.string().required().min(1).max(50).trim().strict().messages({
+    title: Joi.string().required().min(1).max(50).trim().messages({
       // Custom error messages với Joi
       'any.required': 'Title is required',
       'string.empty': 'Title is not allowed to be empty',
-      'string.min': 'Title length must be at least 3 characters long',
+      'string.min': 'Title length must be at least one character long',
       'string.max':
         'Title length must be less than or equal to 50 characters long',
       'string.trim': 'Title must not have leading or trailing whitespace'
     }),
-    description: Joi.string().required().min(3).max(255).trim().strict(),
-    type: Joi.string()
-      .valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE)
-      .required(),
-    ownerIds: Joi.array()
-      .required()
-      .items(
-        Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-      ),
-    memberIds: Joi.array()
-      .required()
-      .items(
-        Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-      )
+    description: Joi.string().required().min(3).max(255).trim(),
+    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
   })
 
   try {
     // Chỉ định abortEarly: false để trả về tất cả các lỗi trong trường hợp có nhiều lỗi validation
     await correctCondition.validateAsync(req.body, { abortEarly: false })
-    // Validate dữ liệu xong xuôi, hợp lệ thì cho request đi tiếp sang Controller
     next()
   } catch (error) {
     // const errorMessage = new Error(error).message
@@ -54,8 +39,8 @@ const createNew = async (req, res, next) => {
 const update = async (req, res, next) => {
   const correctCondition = Joi.object({
     // Lưu ý: Không dùng required() trong trường hợp update
-    title: Joi.string().min(1).max(50).trim().strict(),
-    description: Joi.string().min(3).max(255).trim().strict(),
+    title: Joi.string().min(1).max(50).trim(),
+    description: Joi.string().min(3).max(255).trim(),
     type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE),
     columnOrderIds: Joi.array().items(
       Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)

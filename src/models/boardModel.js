@@ -1,34 +1,23 @@
 import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { BOARD_TYPES } from '~/utils/constants'
-import { columnModel } from './columnModel'
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { cardModel } from './cardModel'
+import { columnModel } from './columnModel'
 
 // Define Collection (name & schema)
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
-  title: Joi.string().required().min(1).max(50).trim().strict(),
-  slug: Joi.string().required().min(3).trim().strict(),
-  description: Joi.string().required().min(3).max(256).trim().strict(),
-
+  title: Joi.string().required().min(1).max(50).trim(),
+  slug: Joi.string().required().min(3).trim(),
+  description: Joi.string().required().min(3).max(255).trim(),
   type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
-
-  // Lưu ý: các item trong mảng columnOrderIds là ObjectId nên cần thêm pattern cho chuẩn
   columnOrderIds: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),
-  ownerIds: Joi.array()
-    .required()
-    .items(
-      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-    ),
-  memberIds: Joi.array()
-    .required()
-    .items(
-      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-    ),
+  ownerIds: Joi.array().required().items(Joi.string()),
+  memberIds: Joi.array().required().items(Joi.string()),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -48,15 +37,6 @@ const createNew = async (data) => {
   // insertOne phải await cho để validateAsync data
   try {
     const validData = await validateBeforeCreating(data)
-
-    // Đối với những dữ liệu liên quan đến ObjectId, biến đổi ở đây
-    if (validData.ownerIds) {
-      validData.ownerIds = validData.ownerIds.map((_id) => new ObjectId(_id))
-    }
-
-    if (validData.memberIds) {
-      validData.memberIds = validData.memberIds.map((_id) => new ObjectId(_id))
-    }
 
     const createdBoard = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
@@ -107,6 +87,24 @@ const getDetails = async (boardId) => {
             localField: '_id',
             foreignField: 'boardId',
             as: 'cards'
+          }
+        },
+        {
+          $addFields: {
+            columns: {
+              $filter: {
+                input: '$columns',
+                as: 'column',
+                cond: { $eq: ['$$column._destroy', false] }
+              }
+            },
+            cards: {
+              $filter: {
+                input: '$cards',
+                as: 'card',
+                cond: { $eq: ['$$card._destroy', false] }
+              }
+            }
           }
         }
       ])
@@ -199,9 +197,15 @@ const getListByUserId = async (userId) => {
   try {
     const result = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
-      .find({
-        memberIds: { $elemMatch: { $eq: new ObjectId(userId) } }
-      })
+      .find(
+        {
+          memberIds: { $elemMatch: { $eq: userId } },
+          _destroy: false
+        },
+        {
+          projection: { title: 1 }
+        }
+      )
       .toArray()
     return result
   } catch (error) {

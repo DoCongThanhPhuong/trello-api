@@ -1,5 +1,5 @@
-import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
+import Joi from 'joi'
 import ApiError from '~/utils/ApiError'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
@@ -9,7 +9,7 @@ const createNew = async (req, res, next) => {
       .required()
       .pattern(OBJECT_ID_RULE)
       .message(OBJECT_ID_RULE_MESSAGE),
-    title: Joi.string().required().min(1).max(50).trim().strict()
+    title: Joi.string().required().min(1).max(50).trim()
   })
 
   try {
@@ -24,19 +24,13 @@ const createNew = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   const correctCondition = Joi.object({
-    // Nếu cần làm tính năng di chuyển Column sang Board khác mới cần validate boardId
-    // boardId: Joi.string()
-    //   .pattern(OBJECT_ID_RULE)
-    //   .message(OBJECT_ID_RULE_MESSAGE),
-    title: Joi.string().min(1).max(50).trim().strict(),
+    title: Joi.string().min(1).max(50).trim(),
     cardOrderIds: Joi.array().items(
       Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
     )
   })
 
   try {
-    // Chỉ định abortEarly: false để trả về tất cả các lỗi trong trường hợp có nhiều lỗi validation
-    // Đối với trường hợp update, cho phép Unknown để không cần đẩy một số fields lên
     await correctCondition.validateAsync(req.body, {
       abortEarly: false,
       allowUnknown: true
@@ -52,7 +46,7 @@ const update = async (req, res, next) => {
 
 const deleteItem = async (req, res, next) => {
   const correctCondition = Joi.object({
-    id: Joi.string()
+    columnId: Joi.string()
       .required()
       .pattern(OBJECT_ID_RULE)
       .message(OBJECT_ID_RULE_MESSAGE)

@@ -1,26 +1,20 @@
 import express from 'express'
-import { StatusCodes } from 'http-status-codes'
-import { boardValidation } from '~/validations/boardValidation'
 import { boardController } from '~/controllers/boardController'
+import { boardValidation } from '~/validations/boardValidation'
 
 const Router = express.Router()
 
 Router.route('/')
-  .get((req, res) => {
-    res.status(StatusCodes.OK).json({ message: 'GET: API get list boards' })
-  })
+  .get(boardController.getListByUserId)
   .post(boardValidation.createNew, boardController.createNew)
 
-Router.route('/:id')
+Router.route('/:boardId')
   .get(boardController.getDetails)
-  .put(boardValidation.update, boardController.update)
+  .patch(boardValidation.update, boardController.update)
 
-// API hỗ trợ việc di chuyển Card giữa các Columns khác nhau trong một Board
-Router.route('/supports/moving_card').put(
+Router.route('/supports/moving_card').patch(
   boardValidation.moveCardToDifferentColumn,
   boardController.moveCardToDifferentColumn
 )
-
-Router.route('/user/:userId').get(boardController.getListByUserId)
 
 export const boardRoute = Router

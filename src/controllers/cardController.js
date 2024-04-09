@@ -10,6 +10,28 @@ const createNew = async (req, res, next) => {
   }
 }
 
+const update = async (req, res, next) => {
+  try {
+    const cardId = req.params.cardId
+
+    if (req.body.comment) {
+      const { uid, email, picture, name } = res.locals
+      Object.assign(req.body.comment, {
+        userId: uid,
+        userEmail: email,
+        userAvatar: picture,
+        userDisplayName: name
+      })
+    }
+
+    const updatedCard = await cardService.update(cardId, req.body)
+    res.status(StatusCodes.OK).json(updatedCard)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const cardController = {
-  createNew
+  createNew,
+  update
 }

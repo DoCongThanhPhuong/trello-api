@@ -1,7 +1,6 @@
-import { env } from '~/config/environment'
 import { MongoClient, ServerApiVersion } from 'mongodb'
+import { env } from '~/config/environment'
 
-// Khởi tạo đối tượng trelloDatabaseInstance ban đầu là null (vì chúng ta chưa connect)
 let trelloDatabaseInstance = null
 
 // Khởi tạo một đối tượng mongoClientInstance để connect tới MongoDB
@@ -14,7 +13,6 @@ const mongoClientInstance = new MongoClient(env.MONGODB_URI, {
   }
 })
 
-// Kết nối tới Database
 export const CONNECT_DB = async () => {
   // Gọi kết nối tới Database Atlas với URI đã khai báo trong thân của clientInstance
   await mongoClientInstance.connect()
@@ -23,7 +21,6 @@ export const CONNECT_DB = async () => {
   trelloDatabaseInstance = mongoClientInstance.db(env.DATABASE_NAME)
 }
 
-// Đóng kết nối tới database khi cần
 export const CLOSE_DB = async () => {
   await mongoClientInstance.close()
 }
