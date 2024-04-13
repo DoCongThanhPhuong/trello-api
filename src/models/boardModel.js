@@ -19,16 +19,8 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   columnOrderIds: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),
-  ownerIds: Joi.array()
-    .required()
-    .items(
-      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-    ),
-  memberIds: Joi.array()
-    .required()
-    .items(
-      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-    ),
+  ownerIds: Joi.array().required().items(Joi.string()),
+  memberIds: Joi.array().required().items(Joi.string()),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
@@ -48,15 +40,6 @@ const createNew = async (data) => {
   // insertOne phải await cho để validateAsync data
   try {
     const validData = await validateBeforeCreating(data)
-
-    // Đối với những dữ liệu liên quan đến ObjectId, biến đổi ở đây
-    if (validData.ownerIds) {
-      validData.ownerIds = validData.ownerIds.map((_id) => new ObjectId(_id))
-    }
-
-    if (validData.memberIds) {
-      validData.memberIds = validData.memberIds.map((_id) => new ObjectId(_id))
-    }
 
     const createdBoard = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
@@ -200,7 +183,7 @@ const getListByUserId = async (userId) => {
     const result = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .find({
-        memberIds: { $elemMatch: { $eq: new ObjectId(userId) } }
+        memberIds: { $elemMatch: { $eq: userId } }
       })
       .toArray()
     return result

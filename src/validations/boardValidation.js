@@ -21,16 +21,8 @@ const createNew = async (req, res, next) => {
     type: Joi.string()
       .valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE)
       .required(),
-    ownerIds: Joi.array()
-      .required()
-      .items(
-        Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-      ),
-    memberIds: Joi.array()
-      .required()
-      .items(
-        Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
-      )
+    ownerIds: Joi.array().required().items(Joi.string()),
+    memberIds: Joi.array().required().items(Joi.string())
   })
 
   try {
