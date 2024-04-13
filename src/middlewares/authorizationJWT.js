@@ -9,10 +9,7 @@ export const authorizationJWT = async (req, res, next) => {
 
     getAuth()
       .verifyIdToken(accessToken)
-      .then((decodedToken) => {
-        // res.locals.uid = decodedToken.uid
-        next()
-      })
+      .then(next())
       .catch((err) => {
         return res.status(403).json({ message: 'Forbidden', error: err })
       })
