@@ -1,6 +1,7 @@
 import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
+import { boardModel } from './boardModel'
 
 // Define Collection (name & schema)
 const USER_COLLECTION_NAME = 'users'
@@ -57,10 +58,35 @@ const findOneByUid = async (uid) => {
   }
 }
 
+const getListByBoardId = async (boardId) => {
+  try {
+    const board = await GET_DB()
+      .collection(boardModel.BOARD_COLLECTION_NAME)
+      .findOne({ _id: new ObjectId(boardId) })
+
+    if (!board || !Array.isArray(board.memberIds)) {
+      return
+    }
+
+    // Tìm các users có uid nằm trong mảng memberIds của board
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .find({
+        uid: { $in: board.memberIds }
+      })
+      .toArray()
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  findOneByUid
+  findOneByUid,
+  getListByBoardId
 }

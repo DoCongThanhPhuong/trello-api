@@ -11,7 +11,11 @@ const createNew = async (req, res, next) => {
     // console.log('req.jwtDecoded:', req.jwtDecoded)
 
     // Điều hướng dữ liệu sang tầng Service
-    const createdBoard = await boardService.createNew(req.body)
+    const createdBoard = await boardService.createNew({
+      ...req.body,
+      ownerIds: [res.locals.uid],
+      memberIds: [res.locals.uid]
+    })
 
     // Có kết quả thì trả về phía Client
     res.status(StatusCodes.CREATED).json(createdBoard)
@@ -51,9 +55,9 @@ const moveCardToDifferentColumn = async (req, res, next) => {
 
 const getListByUserId = async (req, res, next) => {
   try {
-    const userId = req.params.userId
-    const listBoard = await boardService.getListByUserId(userId)
-    res.status(StatusCodes.OK).json(listBoard)
+    const userId = res.locals.uid
+    const boardsList = await boardService.getListByUserId(userId)
+    res.status(StatusCodes.OK).json(boardsList)
   } catch (error) {
     next(error)
   }

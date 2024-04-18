@@ -104,9 +104,9 @@ const moveCardToDifferentColumn = async (reqBody) => {
 
 const getListByUserId = async (userId) => {
   try {
-    const listBoard = await boardModel.getListByUserId(userId)
+    const boardsList = await boardModel.getListByUserId(userId)
 
-    return listBoard
+    return boardsList
   } catch (error) {
     throw error
   }

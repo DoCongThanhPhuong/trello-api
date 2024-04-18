@@ -23,6 +23,17 @@ const createNew = async (reqBody) => {
   }
 }
 
+const getListByBoardId = async (boardId) => {
+  try {
+    const usersList = await userModel.getListByBoardId(boardId)
+
+    return usersList
+  } catch (error) {
+    throw error
+  }
+}
+
 export const userService = {
-  createNew
+  createNew,
+  getListByBoardId
 }

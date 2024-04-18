@@ -1,5 +1,6 @@
 import '~/config/firebase'
 import { getAuth } from 'firebase-admin/auth'
+import { StatusCodes } from 'http-status-codes'
 
 export const authorizationJWT = async (req, res, next) => {
   const authorizationHeader = req.headers.authorization
@@ -9,12 +10,19 @@ export const authorizationJWT = async (req, res, next) => {
 
     getAuth()
       .verifyIdToken(accessToken)
-      .then(next())
+      .then((decodedToken) => {
+        res.locals.uid = decodedToken.uid
+        next()
+      })
       .catch((err) => {
-        return res.status(403).json({ message: 'Forbidden', error: err })
+        return res
+          .status(StatusCodes.FORBIDDEN)
+          .json({ message: 'Forbidden', error: err })
       })
   } else {
     // next()
-    return res.status(401).json({ message: 'Unauthorized' })
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .json({ message: 'Unauthorized' })
   }
 }

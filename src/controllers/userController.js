@@ -10,6 +10,17 @@ const createNew = async (req, res, next) => {
   }
 }
 
+const getListByBoardId = async (req, res, next) => {
+  try {
+    const boardId = req.params.boardId
+    const usersList = await userService.getListByBoardId(boardId)
+    res.status(StatusCodes.OK).json(usersList)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const userController = {
-  createNew
+  createNew,
+  getListByBoardId
 }
