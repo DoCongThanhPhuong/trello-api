@@ -21,6 +21,6 @@ Router.route('/supports/moving_card').put(
   boardController.moveCardToDifferentColumn
 )
 
-Router.route('/user/:userId').get(boardController.getListByUserId)
+Router.route('/user/list_boards').get(boardController.getListByUserId)
 
 export const boardRoute = Router
