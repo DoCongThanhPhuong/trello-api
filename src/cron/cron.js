@@ -2,7 +2,7 @@
 import { CronJob } from 'cron'
 import https from 'https'
 
-const URL = 'https://threads-dophuong.onrender.com'
+const URL = 'https://trello-api-fiiz.onrender.com'
 
 const job = new CronJob('*/14 * * * *', function () {
   https
