@@ -1,13 +1,14 @@
 /* eslint-disable no-console */
 import express from 'express'
 import cors from 'cors'
-import { corsOptions } from './config/cors'
+import { corsOptions } from '~/config/cors'
 import exitHook from 'async-exit-hook'
 import { CONNECT_DB, CLOSE_DB } from '~/config/mongodb'
 import { env } from '~/config/environment'
 import { APIs_V1 } from '~/routes/v1'
-import { authorizationJWT } from './middlewares/authorizationJWT'
-import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
+import { authorizationJWT } from '~/middlewares/authorizationJWT'
+import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
+import job from '~/cron/cron'
 
 const START_SERVER = () => {
   const app = express()
@@ -58,6 +59,7 @@ const START_SERVER = () => {
     console.log('1. Connecting to MongoDB Cloud Atlas...')
     await CONNECT_DB()
     console.log('2. Connected to MongoDB Cloud Atlas!')
+    job.start()
 
     // Khởi động Server Back-end sau khi đã kết nối tới Database thành công
     START_SERVER()
