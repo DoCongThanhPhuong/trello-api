@@ -31,6 +31,7 @@ const START_SERVER = () => {
   if (env.BUILD_MODE === 'production') {
     // Môi trường Production
     app.listen(process.env.PORT, () => {
+      job.start()
       console.log(
         `3. Production: Hello ${env.AUTHOR}, Back-end server is running successfully at Port: ${process.env.PORT}`
       )
@@ -59,7 +60,6 @@ const START_SERVER = () => {
     console.log('1. Connecting to MongoDB Cloud Atlas...')
     await CONNECT_DB()
     console.log('2. Connected to MongoDB Cloud Atlas!')
-    job.start()
 
     // Khởi động Server Back-end sau khi đã kết nối tới Database thành công
     START_SERVER()
