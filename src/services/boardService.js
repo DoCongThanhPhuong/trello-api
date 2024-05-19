@@ -93,7 +93,8 @@ const moveCardToDifferentColumn = async (reqBody) => {
 
     // B3: Cập nhật lại trường columnId của Card di chuyển
     await cardModel.update(reqBody.currentCardId, {
-      columnId: reqBody.nextColumnId
+      columnId: reqBody.nextColumnId,
+      updatedAt: Date.now()
     })
 
     return { updatedResult: 'Successfully!' }
