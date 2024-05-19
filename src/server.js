@@ -9,15 +9,23 @@ import { APIs_V1 } from '~/routes/v1'
 import { authorizationJWT } from '~/middlewares/authorizationJWT'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import job from '~/cron/cron'
+import configureCloudinary from './config/cloudinary'
+import compression from 'compression'
 
 const START_SERVER = () => {
   const app = express()
 
+  // Cấu hình cloudinary
+  configureCloudinary()
+
   // Xử lý CORS
   app.use(cors(corsOptions))
 
-  // Enable req.body json data
-  app.use(express.json())
+  // Enable response compression
+  app.use(compression())
+
+  // Enable req.body json data with a limit of 50mb
+  app.use(express.json({ limit: '50mb' }))
 
   // Xử lý access token
   app.use(authorizationJWT)

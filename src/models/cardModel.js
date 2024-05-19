@@ -16,10 +16,37 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
     .message(OBJECT_ID_RULE_MESSAGE),
 
   title: Joi.string().required().min(1).max(50).trim().strict(),
-  description: Joi.string().optional(),
+  description: Joi.string().optional().allow('').max(256),
 
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
+  cover: Joi.string().uri().default(null),
+  memberIds: Joi.array()
+    .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+    .default([]),
+  comments: Joi.array()
+    .items(
+      Joi.object({
+        userId: Joi.string()
+          .pattern(OBJECT_ID_RULE)
+          .message(OBJECT_ID_RULE_MESSAGE),
+        userEmail: Joi.string().email(),
+        userAvatar: Joi.string().uri(),
+        userDisplayName: Joi.string(),
+        createdAt: Joi.date().timestamp('javascript').default(Date.now())
+      })
+    )
+    .default([]),
+  attachments: Joi.array()
+    .items(
+      Joi.object({
+        fileName: Joi.string(),
+        fileType: Joi.string(),
+        fileURL: Joi.string().uri(),
+        createdAt: Joi.date().timestamp('javascript').default(Date.now())
+      })
+    )
+    .default([]),
   _destroy: Joi.boolean().default(false)
 })
 
