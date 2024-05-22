@@ -1,6 +1,6 @@
 import express from 'express'
-import { userValidation } from '~/validations/userValidation'
 import { userController } from '~/controllers/userController'
+import { userValidation } from '~/validations/userValidation'
 
 const Router = express.Router()
 

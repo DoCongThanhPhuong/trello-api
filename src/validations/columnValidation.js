@@ -1,5 +1,5 @@
-import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
+import Joi from 'joi'
 import ApiError from '~/utils/ApiError'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
@@ -52,7 +52,7 @@ const update = async (req, res, next) => {
 
 const deleteItem = async (req, res, next) => {
   const correctCondition = Joi.object({
-    id: Joi.string()
+    columnId: Joi.string()
       .required()
       .pattern(OBJECT_ID_RULE)
       .message(OBJECT_ID_RULE_MESSAGE)

@@ -1,6 +1,6 @@
+import { v2 as cloudinary } from 'cloudinary'
 import { cardModel } from '~/models/cardModel'
 import { columnModel } from '~/models/columnModel'
-import { v2 as cloudinary } from 'cloudinary'
 
 const createNew = async (reqBody) => {
   try {
@@ -23,19 +23,26 @@ const createNew = async (reqBody) => {
 
 const update = async (cardId, reqBody) => {
   try {
+    const card = await cardModel.findOneById(cardId)
+    const updateData = { ...reqBody }
+
+    if (reqBody.comment) {
+      reqBody.comment.updatedAt = Date.now()
+      updateData.comments = [...card.comments, reqBody.comment]
+      delete updateData.comment
+    }
+
     if (reqBody.cover) {
-      const card = await cardModel.findOneById(cardId)
       if (card.cover) {
         const imgId = card.cover.split('/').pop().split('.')[0]
         await cloudinary.uploader.destroy(imgId)
       }
       const uploadedResponse = await cloudinary.uploader.upload(reqBody.cover)
-      reqBody.cover = uploadedResponse.secure_url
+      updateData.cover = uploadedResponse.secure_url
     }
-    const updateData = {
-      ...reqBody,
-      updatedAt: Date.now()
-    }
+
+    updateData.updatedAt = Date.now()
+
     const updatedCard = await cardModel.update(cardId, updateData)
 
     return updatedCard

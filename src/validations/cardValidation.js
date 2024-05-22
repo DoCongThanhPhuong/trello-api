@@ -1,5 +1,5 @@
-import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
+import Joi from 'joi'
 import ApiError from '~/utils/ApiError'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
@@ -31,21 +31,9 @@ const update = async (req, res, next) => {
     title: Joi.string().min(1).max(50).trim().strict(),
     cover: Joi.string().uri(),
     memberIds: Joi.array().items(Joi.string()),
-    comments: Joi.array().items(
-      Joi.object({
-        userId: Joi.string(),
-        userEmail: Joi.string().email(),
-        userAvatar: Joi.string().uri(),
-        userDisplayName: Joi.string()
-      })
-    ),
-    attachments: Joi.array().items(
-      Joi.object({
-        fileName: Joi.string(),
-        fileType: Joi.string(),
-        fileURL: Joi.string().uri()
-      })
-    )
+    comment: Joi.object({
+      content: Joi.string().required().min(1).max(500).trim().strict()
+    })
   })
 
   try {

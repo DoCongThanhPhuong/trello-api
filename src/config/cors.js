@@ -1,7 +1,7 @@
-import { WHITELIST_DOMAINS } from '~/utils/constants'
-import { env } from '~/config/environment'
 import { StatusCodes } from 'http-status-codes'
+import { env } from '~/config/environment'
 import ApiError from '~/utils/ApiError'
+import { WHITELIST_DOMAINS } from '~/utils/constants'
 
 // Cấu hình CORS Option trong dự án thực tế
 export const corsOptions = {

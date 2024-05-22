@@ -1,17 +1,17 @@
 import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { BOARD_TYPES } from '~/utils/constants'
-import { columnModel } from './columnModel'
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { cardModel } from './cardModel'
+import { columnModel } from './columnModel'
 
 // Define Collection (name & schema)
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(1).max(50).trim().strict(),
   slug: Joi.string().required().min(3).trim().strict(),
-  description: Joi.string().required().min(3).max(256).trim().strict(),
+  description: Joi.string().required().min(3).max(255).trim().strict(),
 
   type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
 
@@ -90,6 +90,24 @@ const getDetails = async (boardId) => {
             localField: '_id',
             foreignField: 'boardId',
             as: 'cards'
+          }
+        },
+        {
+          $addFields: {
+            columns: {
+              $filter: {
+                input: '$columns',
+                as: 'column',
+                cond: { $eq: ['$$column._destroy', false] }
+              }
+            },
+            cards: {
+              $filter: {
+                input: '$cards',
+                as: 'card',
+                cond: { $eq: ['$$card._destroy', false] }
+              }
+            }
           }
         }
       ])
@@ -182,9 +200,15 @@ const getListByUserId = async (userId) => {
   try {
     const result = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
-      .find({
-        memberIds: { $elemMatch: { $eq: userId } }
-      })
+      .find(
+        {
+          memberIds: { $elemMatch: { $eq: userId } },
+          _destroy: false
+        },
+        {
+          projection: { title: 1 }
+        }
+      )
       .toArray()
     return result
   } catch (error) {

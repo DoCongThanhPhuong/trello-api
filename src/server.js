@@ -1,16 +1,16 @@
 /* eslint-disable no-console */
-import express from 'express'
-import cors from 'cors'
-import { corsOptions } from '~/config/cors'
 import exitHook from 'async-exit-hook'
-import { CONNECT_DB, CLOSE_DB } from '~/config/mongodb'
+import compression from 'compression'
+import cors from 'cors'
+import express from 'express'
+import { corsOptions } from '~/config/cors'
 import { env } from '~/config/environment'
-import { APIs_V1 } from '~/routes/v1'
+import { CLOSE_DB, CONNECT_DB } from '~/config/mongodb'
+import job from '~/cron/cron'
 import { authorizationJWT } from '~/middlewares/authorizationJWT'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
-import job from '~/cron/cron'
+import { APIs_V1 } from '~/routes/v1'
 import configureCloudinary from './config/cloudinary'
-import compression from 'compression'
 
 const START_SERVER = () => {
   const app = express()

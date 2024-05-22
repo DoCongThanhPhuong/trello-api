@@ -12,7 +12,7 @@ const createNew = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   try {
-    const columnId = req.params.id
+    const columnId = req.params.columnId
     const updatedColumn = await columnService.update(columnId, req.body)
 
     res.status(StatusCodes.OK).json(updatedColumn)
@@ -23,7 +23,7 @@ const update = async (req, res, next) => {
 
 const deleteItem = async (req, res, next) => {
   try {
-    const columnId = req.params.id
+    const columnId = req.params.columnId
     const result = await columnService.deleteItem(columnId)
 
     res.status(StatusCodes.OK).json(result)

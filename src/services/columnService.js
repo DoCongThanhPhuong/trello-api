@@ -1,8 +1,8 @@
-import { columnModel } from '~/models/columnModel'
+import { StatusCodes } from 'http-status-codes'
 import { boardModel } from '~/models/boardModel'
 import { cardModel } from '~/models/cardModel'
+import { columnModel } from '~/models/columnModel'
 import ApiError from '~/utils/ApiError'
-import { StatusCodes } from 'http-status-codes'
 
 const createNew = async (reqBody) => {
   try {
@@ -49,10 +49,13 @@ const deleteItem = async (columnId) => {
     }
 
     // Xóa Column
-    await columnModel.deleteOneById(columnId)
+    await columnModel.update(columnId, {
+      _destroy: true,
+      updatedAt: Date.now()
+    })
 
     // Xóa toàn bộ Cards thuộc Column trên
-    await cardModel.deleteManyByColumnId(columnId)
+    await cardModel.destroyManyByColumnId(columnId)
 
     // Xóa columnId trong mảng columnOrderIds của Board chứa nó
     await boardModel.pullColumnOrderIds(targetColumn)

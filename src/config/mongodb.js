@@ -1,5 +1,5 @@
-import { env } from '~/config/environment'
 import { MongoClient, ServerApiVersion } from 'mongodb'
+import { env } from '~/config/environment'
 
 // Khởi tạo đối tượng trelloDatabaseInstance ban đầu là null (vì chúng ta chưa connect)
 let trelloDatabaseInstance = null

@@ -1,8 +1,8 @@
 import express from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { boardRoute } from '~/routes/v1/boardRoute'
-import { columnRoute } from '~/routes/v1/columnRoute'
 import { cardRoute } from '~/routes/v1/cardRoute'
+import { columnRoute } from '~/routes/v1/columnRoute'
 import { userRoute } from './userRoute'
 
 const Router = express.Router()
