@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import Joi from 'joi'
 import ApiError from '~/utils/ApiError'
 
-const createNew = async (req, res, next) => {
+const login = async (req, res, next) => {
   const correctCondition = Joi.object({
     uid: Joi.string().required(),
     email: Joi.string().required().email(),
@@ -21,5 +21,5 @@ const createNew = async (req, res, next) => {
 }
 
 export const userValidation = {
-  createNew
+  login
 }

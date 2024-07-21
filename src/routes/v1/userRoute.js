@@ -4,8 +4,8 @@ import { userValidation } from '~/validations/userValidation'
 
 const Router = express.Router()
 
-Router.route('/').post(userValidation.createNew, userController.createNew)
+Router.route('/login').post(userValidation.login, userController.login)
 
-Router.route('/:boardId').get(userController.getListByBoardId)
+Router.route('/:boardId').get(userController.getBoardMembers)
 
 export const userRoute = Router

@@ -20,9 +20,7 @@ export const authorizationJWT = async (req, res, next) => {
     next()
   } catch (err) {
     if (err.code === 'auth/id-token-expired') {
-      return res
-        .status(StatusCodes.UNAUTHORIZED)
-        .json({ message: 'Token expired' })
+      return res.status(StatusCodes.GONE).json({ message: 'Token expired' })
     }
     return res
       .status(StatusCodes.FORBIDDEN)

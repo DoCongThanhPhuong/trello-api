@@ -1,19 +1,15 @@
 import { userModel } from '~/models/userModel'
 
-const createNew = async (reqBody) => {
+const login = async (reqBody) => {
   try {
-    const newUser = {
-      ...reqBody
-    }
-    // Kiểm tra xem uid đã tồn tại trong cơ sở dữ liệu chưa
-    const existingUser = await userModel.findOneByUid(newUser.uid)
+    const foundUser = await userModel.findOneByUid(reqBody.uid)
 
-    if (existingUser) {
+    if (foundUser) {
       // Nếu uid đã tồn tại, trả về user đã tồn tại
-      return existingUser
+      return foundUser
     } else {
       // Nếu uid chưa tồn tại, thêm mới user vào cơ sở dữ liệu và trả về user mới
-      const createdUser = await userModel.createNew(newUser)
+      const createdUser = await userModel.createNew(reqBody)
       const getNewUser = await userModel.findOneById(createdUser.insertedId)
 
       return getNewUser
@@ -23,17 +19,17 @@ const createNew = async (reqBody) => {
   }
 }
 
-const getListByBoardId = async (boardId) => {
+const getBoardMembers = async (boardId) => {
   try {
-    const usersList = await userModel.getListByBoardId(boardId)
+    const boardMembers = await userModel.getBoardMembers(boardId)
 
-    return usersList
+    return boardMembers
   } catch (error) {
     throw error
   }
 }
 
 export const userService = {
-  createNew,
-  getListByBoardId
+  login,
+  getBoardMembers
 }

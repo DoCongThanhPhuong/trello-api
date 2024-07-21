@@ -58,7 +58,7 @@ const findOneByUid = async (uid) => {
   }
 }
 
-const getListByBoardId = async (boardId) => {
+const getBoardMembers = async (boardId) => {
   try {
     const board = await GET_DB()
       .collection(boardModel.BOARD_COLLECTION_NAME)
@@ -88,5 +88,5 @@ export const userModel = {
   createNew,
   findOneById,
   findOneByUid,
-  getListByBoardId
+  getBoardMembers
 }

@@ -15,6 +15,11 @@ import configureCloudinary from './config/cloudinary'
 const START_SERVER = () => {
   const app = express()
 
+  app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-store')
+    next()
+  })
+
   // Cấu hình cloudinary
   configureCloudinary()
 

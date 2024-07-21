@@ -1,5 +1,4 @@
 import express from 'express'
-import { StatusCodes } from 'http-status-codes'
 import { boardController } from '~/controllers/boardController'
 import { checkBoardAccess } from '~/middlewares/checkBoardAccess'
 import { checkBoardType } from '~/middlewares/checkBoardType'
@@ -8,9 +7,7 @@ import { boardValidation } from '~/validations/boardValidation'
 const Router = express.Router()
 
 Router.route('/')
-  .get((req, res) => {
-    res.status(StatusCodes.OK).json({ message: 'GET: API get list boards' })
-  })
+  .get(boardController.getListByUserId)
   .post(boardValidation.createNew, boardController.createNew)
 
 Router.route('/:boardId')
@@ -22,7 +19,5 @@ Router.route('/supports/moving_card').put(
   boardValidation.moveCardToDifferentColumn,
   boardController.moveCardToDifferentColumn
 )
-
-Router.route('/user/list_boards').get(boardController.getListByUserId)
 
 export const boardRoute = Router
