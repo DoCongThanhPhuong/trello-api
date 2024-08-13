@@ -1,12 +1,14 @@
 import 'dotenv/config'
 
 export const env = {
-  MONGODB_URI: process.env.MONGODB_URI,
-  DATABASE_NAME: process.env.DATABASE_NAME,
+  AUTHOR: process.env.AUTHOR,
+  BUILD_MODE: process.env.BUILD_MODE,
   LOCAL_DEV_APP_HOST: process.env.LOCAL_DEV_APP_HOST,
   LOCAL_DEV_APP_PORT: process.env.LOCAL_DEV_APP_PORT,
-  BUILD_MODE: process.env.BUILD_MODE,
-  AUTHOR: process.env.AUTHOR,
+  /** MongoDB */
+  MONGODB_URI: process.env.MONGODB_URI,
+  DATABASE_NAME: process.env.DATABASE_NAME,
+  /** Firebase */
   FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
   FIREBASE_AUTH_DOMAIN: process.env.FIREBASE_AUTH_DOMAIN,
   FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
@@ -14,7 +16,11 @@ export const env = {
   FIREBASE_MESSAGING_SENDER_ID: process.env.FIREBASE_MESSAGING_SENDER_ID,
   FIREBASE_APP_ID: process.env.FIREBASE_APP_ID,
   FIREBASE_MEASUREMENT_ID: process.env.FIREBASE_MEASUREMENT_ID,
+  /** Cloudinary */
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+  /** Discord */
+  DISCORD_CHANNEL_ID: process.env.DISCORD_CHANNEL_ID,
+  DISCORD_TOKEN: process.env.DISCORD_TOKEN
 }

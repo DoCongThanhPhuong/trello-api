@@ -14,6 +14,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null)
 })
 
+const INVALID_UPDATE_FIELDS = ['_id', 'uid', 'createdAt']
+
 const validateBeforeCreating = async (data) => {
   return await USER_COLLECTION_SCHEMA.validateAsync(data, {
     abortEarly: false
@@ -47,11 +49,43 @@ const findOneById = async (userId) => {
   }
 }
 
-const findOneByUid = async (uid) => {
+const findOneByUid = async ({ uid, select = [] }) => {
   try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOne({
-      uid: uid
+    const projection = select.reduce((acc, field) => {
+      acc[field] = 0
+      return acc
+    }, {})
+
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOne({ uid: uid }, { projection })
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const update = async (uid, updateData) => {
+  try {
+    Object.keys(updateData).forEach((fieldName) => {
+      if (INVALID_UPDATE_FIELDS.includes(fieldName)) {
+        delete updateData[fieldName]
+      }
     })
+
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          uid: uid
+        },
+        {
+          $set: updateData
+        },
+        { returnDocument: 'after' }
+      )
+
     return result
   } catch (error) {
     throw new Error(error)
@@ -68,7 +102,6 @@ const getBoardMembers = async (boardId) => {
       return
     }
 
-    // Tìm các users có uid nằm trong mảng memberIds của board
     const result = await GET_DB()
       .collection(USER_COLLECTION_NAME)
       .find({
@@ -88,5 +121,6 @@ export const userModel = {
   createNew,
   findOneById,
   findOneByUid,
+  update,
   getBoardMembers
 }

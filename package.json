@@ -5,7 +5,7 @@
   "author": "DoCongThanhPhuong",
   "description": "Trello API",
   "engines": {
-    "node": "18.16.0"
+    "node": "18.x"
   },
   "scripts": {
     "lint": "eslint src --ext js --report-unused-disable-directives --max-warnings 0",
@@ -23,6 +23,7 @@
     "cors": "^2.8.5",
     "cron": "^3.1.7",
     "cross-env": "^7.0.3",
+    "discord.js": "^14.15.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "firebase-admin": "^12.0.0",

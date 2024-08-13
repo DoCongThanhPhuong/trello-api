@@ -2,13 +2,13 @@
 import { CronJob } from 'cron'
 import https from 'https'
 
-const URL = 'https://trello-api-fiiz.onrender.com'
+const URL = 'https://trello-api-fiiz.onrender.com/v1/status'
 
 const job = new CronJob('*/14 * * * *', function () {
   https
     .get(URL, (res) => {
       if (res.statusCode === 200) {
-        console.log('GET request sent successfully')
+        console.log('APIs v1 are ready to use')
       } else {
         console.log('GET request failed', res.statusCode)
       }

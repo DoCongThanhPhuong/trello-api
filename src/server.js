@@ -7,7 +7,6 @@ import { corsOptions } from '~/config/cors'
 import { env } from '~/config/environment'
 import { CLOSE_DB, CONNECT_DB } from '~/config/mongodb'
 import job from '~/cron/cron'
-import { authorizationJWT } from '~/middlewares/authorizationJWT'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import { APIs_V1 } from '~/routes/v1'
 import configureCloudinary from './config/cloudinary'
@@ -31,9 +30,6 @@ const START_SERVER = () => {
 
   // Enable req.body json data with a limit of 50mb
   app.use(express.json({ limit: '50mb' }))
-
-  // Xử lý access token
-  app.use(authorizationJWT)
 
   // Use APIs V1
   app.use('/v1', APIs_V1)

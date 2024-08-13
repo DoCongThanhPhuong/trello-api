@@ -20,7 +20,18 @@ const getBoardMembers = async (req, res, next) => {
   }
 }
 
+const getProfile = async (req, res, next) => {
+  try {
+    const userId = res.locals.uid
+    const user = await userService.getProfile(userId)
+    res.status(StatusCodes.OK).json(user)
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const userController = {
   login,
-  getBoardMembers
+  getBoardMembers,
+  getProfile
 }

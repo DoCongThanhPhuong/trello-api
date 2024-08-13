@@ -2,7 +2,6 @@ import { boardModel } from '~/models/boardModel'
 import { cardModel } from '~/models/cardModel'
 import { columnModel } from '~/models/columnModel'
 import { slugify } from '~/utils/formatters'
-
 import { StatusCodes } from 'http-status-codes'
 import { cloneDeep } from 'lodash'
 import ApiError from '~/utils/ApiError'
