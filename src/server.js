@@ -19,10 +19,8 @@ const START_SERVER = () => {
     next()
   })
 
-  // Cấu hình cloudinary
   configureCloudinary()
 
-  // Xử lý CORS
   app.use(cors(corsOptions))
 
   // Enable response compression
@@ -38,7 +36,7 @@ const START_SERVER = () => {
   app.use(errorHandlingMiddleware)
 
   if (env.BUILD_MODE === 'production') {
-    // Môi trường Production
+    // Production
     app.listen(process.env.PORT, () => {
       job.start()
       console.log(
@@ -46,7 +44,7 @@ const START_SERVER = () => {
       )
     })
   } else {
-    // Môi trường local DEV
+    // Local DEV
     app.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
       console.log(
         `3. Local DEV: Hello ${env.AUTHOR}, Back-end server is running successfully at Host: ${env.LOCAL_DEV_APP_HOST} and Port: ${env.LOCAL_DEV_APP_PORT}`

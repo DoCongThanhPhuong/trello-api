@@ -9,13 +9,10 @@ import { columnModel } from './columnModel'
 // Define Collection (name & schema)
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
-  title: Joi.string().required().min(1).max(50).trim().strict(),
-  slug: Joi.string().required().min(3).trim().strict(),
-  description: Joi.string().required().min(3).max(255).trim().strict(),
-
+  title: Joi.string().required().min(1).max(50).trim(),
+  slug: Joi.string().required().min(3).trim(),
+  description: Joi.string().required().min(3).max(255).trim(),
   type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
-
-  // Lưu ý: các item trong mảng columnOrderIds là ObjectId nên cần thêm pattern cho chuẩn
   columnOrderIds: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),

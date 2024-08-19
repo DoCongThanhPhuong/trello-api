@@ -14,10 +14,8 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
     .required()
     .pattern(OBJECT_ID_RULE)
     .message(OBJECT_ID_RULE_MESSAGE),
-
-  title: Joi.string().required().min(1).max(50).trim().strict(),
-  description: Joi.string().optional().min(3).max(255).trim().strict(),
-
+  title: Joi.string().required().min(1).max(50).trim(),
+  description: Joi.string().optional().min(3).max(255).trim(),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
   cover: Joi.string().uri().default(null),
@@ -29,7 +27,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
         userEmail: Joi.string().required().email(),
         userAvatar: Joi.string().required().uri(),
         userDisplayName: Joi.string().required(),
-        content: Joi.string().required().min(1).max(500).trim().strict(),
+        content: Joi.string().required().min(1).max(500).trim(),
         createdAt: Joi.date().timestamp('javascript').default(Date.now())
       })
     )

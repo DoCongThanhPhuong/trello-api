@@ -1,9 +1,8 @@
 /* eslint-disable no-console */
 'use strict'
 
+import { Client, GatewayIntentBits } from 'discord.js'
 import { env } from '~/config/environment'
-
-const { Client, GatewayIntentBits } = require('discord.js')
 
 const client = new Client({
   intents: [

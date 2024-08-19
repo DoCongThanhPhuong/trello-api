@@ -13,7 +13,7 @@ const createNew = async (req, res, next) => {
       .required()
       .pattern(OBJECT_ID_RULE)
       .message(OBJECT_ID_RULE_MESSAGE),
-    title: Joi.string().required().min(1).max(50).trim().strict()
+    title: Joi.string().required().min(1).max(50).trim()
   })
 
   try {
@@ -28,11 +28,11 @@ const createNew = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   const correctCondition = Joi.object({
-    title: Joi.string().min(1).max(50).trim().strict(),
+    title: Joi.string().min(1).max(50).trim(),
     cover: Joi.string().uri(),
     memberIds: Joi.array().items(Joi.string()),
     comment: Joi.object({
-      content: Joi.string().required().min(1).max(500).trim().strict()
+      content: Joi.string().required().min(1).max(500).trim()
     })
   })
 

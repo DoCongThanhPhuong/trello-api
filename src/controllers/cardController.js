@@ -23,8 +23,8 @@ const update = async (req, res, next) => {
         userDisplayName: name
       })
     }
-    const updatedCard = await cardService.update(cardId, req.body)
 
+    const updatedCard = await cardService.update(cardId, req.body)
     res.status(StatusCodes.OK).json(updatedCard)
   } catch (error) {
     next(error)

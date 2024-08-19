@@ -44,23 +44,17 @@ const deleteItem = async (columnId) => {
   try {
     const targetColumn = await columnModel.findOneById(columnId)
 
-    if (!targetColumn) {
+    if (!targetColumn)
       throw new ApiError(StatusCodes.NOT_FOUND, 'Column not found!')
-    }
 
-    // Xóa Column
-    await columnModel.update(columnId, {
-      _destroy: true,
-      updatedAt: Date.now()
-    })
-
-    // Xóa toàn bộ Cards thuộc Column trên
+    // delete the column
+    await columnModel.deleteOneById(columnId)
+    // delete the cards in this column
     await cardModel.destroyManyByColumnId(columnId)
-
-    // Xóa columnId trong mảng columnOrderIds của Board chứa nó
+    // remove the columnId from the columnOrderIds of the board
     await boardModel.pullColumnOrderIds(targetColumn)
 
-    return { deleteResult: 'Column and its Cards are deleted successfully!' }
+    return { deleteResult: 'Column and its cards are deleted successfully!' }
   } catch (error) {
     throw error
   }
