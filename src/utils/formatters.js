@@ -1,3 +1,5 @@
+import { omit } from 'lodash'
+
 export const slugify = (val) => {
   if (!val) return ''
   return String(val)
@@ -9,3 +11,6 @@ export const slugify = (val) => {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
 }
+
+export const omitUser = (user) =>
+  omit(user, ['password', 'verifyToken', '_destroy'])

@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import exitHook from 'async-exit-hook'
 import compression from 'compression'
+import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import express from 'express'
 import { corsOptions } from '~/config/cors'
@@ -9,7 +10,6 @@ import { CLOSE_DB, CONNECT_DB } from '~/config/mongodb'
 import job from '~/cron/cron'
 import { errorHandlingMiddleware } from '~/middlewares/errorHandlingMiddleware'
 import { APIs_V1 } from '~/routes/v1'
-import configureCloudinary from './config/cloudinary'
 
 const START_SERVER = () => {
   const app = express()
@@ -19,7 +19,7 @@ const START_SERVER = () => {
     next()
   })
 
-  configureCloudinary()
+  app.use(cookieParser())
 
   app.use(cors(corsOptions))
 
