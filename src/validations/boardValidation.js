@@ -6,7 +6,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 
 const createNew = async (req, res, next) => {
   const correctCondition = Joi.object({
-    title: Joi.string().required().min(1).max(50).trim().messages({
+    title: Joi.string().required().min(3).max(50).trim().messages({
       // Custom error messages với Joi
       'any.required': 'Title is required',
       'string.empty': 'Title is not allowed to be empty',

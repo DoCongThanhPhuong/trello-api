@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { v4 as uuidv4 } from 'uuid'
 import { env } from '~/config/environment'
 import { userModel } from '~/models/userModel'
+import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
 import { JwtProvider } from '~/providers/JwtProvider'
 import { MailProvider } from '~/providers/MailProvider'
 import ApiError from '~/utils/ApiError'
@@ -14,7 +15,7 @@ const createNew = async (reqBody) => {
     const { email, password } = reqBody
     const foundUser = await userModel.findOneByEmail(email)
     if (foundUser) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exists')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exists!')
     }
 
     const nameFromEmail = email.split('@')[0]
@@ -50,14 +51,14 @@ const verifyAccount = async (reqBody) => {
     const { email, token } = reqBody
     const foundUser = await userModel.findOneByEmail(email)
     if (!foundUser) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found!')
     }
     const { _id, isActive, verifyToken } = foundUser
     if (isActive) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'User is already verified')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User is already verified!')
     }
     if (token !== verifyToken) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Token is invalid')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Token is invalid!')
     }
     const updateData = {
       isActive: true,
@@ -75,16 +76,16 @@ const login = async (reqBody) => {
     const { email, password } = reqBody
     const foundUser = await userModel.findOneByEmail(email)
     if (!foundUser) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User not found!')
     }
     if (!foundUser.isActive) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'User is not verified')
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User is not verified!')
     }
     const isPasswordValid = bcryptjs.compareSync(password, foundUser.password)
     if (!isPasswordValid) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        'Your email or password is incorrect'
+        'Your email or password is incorrect!'
       )
     }
     const userInfo = {
@@ -138,9 +139,48 @@ const refreshToken = async (refreshToken) => {
   }
 }
 
+const update = async (userId, reqBody, userAvatarFile) => {
+  try {
+    const foundUser = await userModel.findOneById(userId)
+    if (!foundUser) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found!')
+    }
+    if (!foundUser.isActive) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User is not verified!')
+    }
+    let updateData = {}
+    if (reqBody.currentPassword && reqBody.newPassword) {
+      const isPasswordValid = bcryptjs.compareSync(
+        reqBody.currentPassword,
+        foundUser.password
+      )
+      if (!isPasswordValid) {
+        throw new ApiError(
+          StatusCodes.BAD_REQUEST,
+          'Current password is incorrect!'
+        )
+      }
+      updateData = { password: bcryptjs.hashSync(reqBody.newPassword, 8) }
+    } else if (userAvatarFile) {
+      const uploadResult = await CloudinaryProvider.streamUpload(
+        userAvatarFile.buffer,
+        'users'
+      )
+      updateData = { avatar: uploadResult.secure_url }
+    } else {
+      updateData = { ...reqBody }
+    }
+    const updatedUser = await userModel.update(userId, updateData)
+    return omitUser(updatedUser)
+  } catch (error) {
+    throw error
+  }
+}
+
 export const userService = {
   createNew,
   verifyAccount,
   login,
-  refreshToken
+  refreshToken,
+  update
 }
