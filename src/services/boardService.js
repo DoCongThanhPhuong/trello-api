@@ -1,18 +1,19 @@
+import { StatusCodes } from 'http-status-codes'
+import { cloneDeep } from 'lodash'
 import { boardModel } from '~/models/boardModel'
 import { cardModel } from '~/models/cardModel'
 import { columnModel } from '~/models/columnModel'
-import { slugify } from '~/utils/formatters'
-import { StatusCodes } from 'http-status-codes'
-import { cloneDeep } from 'lodash'
 import ApiError from '~/utils/ApiError'
+import { DEFAULT_PAGE_SIZE } from '~/utils/constants'
+import { slugify } from '~/utils/formatters'
 
-const createNew = async (reqBody) => {
+const createNew = async (userId, reqBody) => {
   try {
     const newBoard = {
       ...reqBody,
       slug: slugify(reqBody.title)
     }
-    const createdBoard = await boardModel.createNew(newBoard)
+    const createdBoard = await boardModel.createNew(userId, newBoard)
     const getNewBoard = await boardModel.findOneById(createdBoard.insertedId)
     return getNewBoard
   } catch (error) {
@@ -20,9 +21,9 @@ const createNew = async (reqBody) => {
   }
 }
 
-const getDetails = async (boardId) => {
+const getDetails = async (userId, boardId) => {
   try {
-    const board = await boardModel.getDetails(boardId)
+    const board = await boardModel.getDetails(userId, boardId)
     if (!board) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found!')
     }
@@ -85,11 +86,16 @@ const moveCardToDifferentColumn = async (reqBody) => {
   }
 }
 
-const getListByUserId = async (userId) => {
+const listUserBoards = async (userId, page, size) => {
   try {
-    const boardsList = await boardModel.getListByUserId(userId)
-
-    return boardsList
+    if (!page) page = 1
+    if (!size) size = DEFAULT_PAGE_SIZE
+    const results = await boardModel.listUserBoards(
+      userId,
+      parseInt(page, 10),
+      parseInt(size, 10)
+    )
+    return results
   } catch (error) {
     throw error
   }
@@ -100,5 +106,5 @@ export const boardService = {
   getDetails,
   update,
   moveCardToDifferentColumn,
-  getListByUserId
+  listUserBoards
 }

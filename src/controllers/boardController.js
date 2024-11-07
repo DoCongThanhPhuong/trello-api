@@ -3,11 +3,8 @@ import { boardService } from '~/services/boardService'
 
 const createNew = async (req, res, next) => {
   try {
-    const createdBoard = await boardService.createNew({
-      ...req.body,
-      ownerIds: [res.locals.uid],
-      memberIds: [res.locals.uid]
-    })
+    const userId = req.jwtDecoded._id
+    const createdBoard = await boardService.createNew(userId, req.body)
     res.status(StatusCodes.CREATED).json(createdBoard)
   } catch (error) {
     next(error)
@@ -16,8 +13,9 @@ const createNew = async (req, res, next) => {
 
 const getDetails = async (req, res, next) => {
   try {
+    const userId = req.jwtDecoded._id
     const boardId = req.params.boardId
-    const board = await boardService.getDetails(boardId)
+    const board = await boardService.getDetails(userId, boardId)
     res.status(StatusCodes.OK).json(board)
   } catch (error) {
     next(error)
@@ -43,11 +41,12 @@ const moveCardToDifferentColumn = async (req, res, next) => {
   }
 }
 
-const getListByUserId = async (req, res, next) => {
+const listUserBoards = async (req, res, next) => {
   try {
-    const userId = res.locals.uid
-    const boardsList = await boardService.getListByUserId(userId)
-    res.status(StatusCodes.OK).json(boardsList)
+    const userId = req.jwtDecoded._id
+    const { page, size } = req.query
+    const results = await boardService.listUserBoards(userId, page, size)
+    res.status(StatusCodes.OK).json(results)
   } catch (error) {
     next(error)
   }
@@ -58,5 +57,5 @@ export const boardController = {
   getDetails,
   update,
   moveCardToDifferentColumn,
-  getListByUserId
+  listUserBoards
 }

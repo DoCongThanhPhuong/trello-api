@@ -11,3 +11,5 @@ export const WEBSITE_DOMAIN =
   env.BUILD_MODE === 'production'
     ? 'https://trello-web-black.vercel.app'
     : 'http://localhost:5173'
+
+export const DEFAULT_PAGE_SIZE = 12
