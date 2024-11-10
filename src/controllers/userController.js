@@ -14,7 +14,7 @@ const createNew = async (req, res, next) => {
 const verifyAccount = async (req, res, next) => {
   try {
     const result = await userService.verifyAccount(req.body)
-    res.status(StatusCodes.CREATED).json(result)
+    res.status(StatusCodes.OK).json(result)
   } catch (error) {
     next(error)
   }
@@ -38,7 +38,7 @@ const login = async (req, res, next) => {
       maxAge: ms('14 days')
     })
 
-    res.status(StatusCodes.CREATED).json(result)
+    res.status(StatusCodes.OK).json(result)
   } catch (error) {
     next(error)
   }
@@ -78,7 +78,7 @@ const update = async (req, res, next) => {
       req.body,
       userAvatarFile
     )
-    res.status(StatusCodes.CREATED).json(updatedUser)
+    res.status(StatusCodes.OK).json(updatedUser)
   } catch (error) {
     next(error)
   }

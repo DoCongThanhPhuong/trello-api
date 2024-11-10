@@ -1,7 +1,12 @@
 import Joi from 'joi'
 import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
+import {
+  EMAIL_RULE,
+  EMAIL_RULE_MESSAGE,
+  OBJECT_ID_RULE,
+  OBJECT_ID_RULE_MESSAGE
+} from '~/utils/validators'
 
 // Define Collection (name & schema)
 const CARD_COLLECTION_NAME = 'cards'
@@ -15,33 +20,31 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
     .pattern(OBJECT_ID_RULE)
     .message(OBJECT_ID_RULE_MESSAGE),
   title: Joi.string().required().min(1).max(50).trim(),
-  description: Joi.string().optional().min(3).max(255).trim(),
-  createdAt: Joi.date().timestamp('javascript').default(Date.now),
-  updatedAt: Joi.date().timestamp('javascript').default(null),
-  cover: Joi.string().uri().default(null),
-  memberIds: Joi.array().items(Joi.string()).default([]),
+  description: Joi.string().allow('').optional(),
+  cover: Joi.string().default(null),
+  memberIds: Joi.array()
+    .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+    .default([]),
   comments: Joi.array()
     .items(
       Joi.object({
-        userId: Joi.string().required(),
-        userEmail: Joi.string().required().email(),
-        userAvatar: Joi.string().required().uri(),
+        userId: Joi.string()
+          .required()
+          .pattern(OBJECT_ID_RULE)
+          .message(OBJECT_ID_RULE_MESSAGE),
+        userEmail: Joi.string()
+          .required()
+          .pattern(EMAIL_RULE)
+          .message(EMAIL_RULE_MESSAGE),
+        userAvatar: Joi.string().default(null),
         userDisplayName: Joi.string().required(),
-        content: Joi.string().required().min(1).max(500).trim(),
-        createdAt: Joi.date().timestamp('javascript').default(Date.now())
+        content: Joi.string().required().trim(),
+        commentedAt: Joi.date().timestamp()
       })
     )
     .default([]),
-  attachments: Joi.array()
-    .items(
-      Joi.object({
-        fileName: Joi.string(),
-        fileType: Joi.string(),
-        fileURL: Joi.string().uri(),
-        createdAt: Joi.date().timestamp('javascript').default(Date.now())
-      })
-    )
-    .default([]),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+  updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
 })
 
@@ -124,28 +127,22 @@ const deleteManyByColumnId = async (columnId) => {
         columnId: new ObjectId(columnId)
       })
 
-    // console.log('🚀 ~ deleteManyByColumnId ~ result:', result)
     return result
   } catch (error) {
     throw new Error(error)
   }
 }
 
-const destroyManyByColumnId = async (columnId) => {
+const unshiftNewComment = async (cardId, commentData) => {
   try {
     const result = await GET_DB()
       .collection(CARD_COLLECTION_NAME)
-      .updateMany(
-        { columnId: new ObjectId(columnId) },
-        {
-          $set: {
-            _destroy: true,
-            updatedAt: Date.now()
-          }
-        }
+      .findOneAndUpdate(
+        { _id: new ObjectId(cardId) },
+        { $push: { comments: { $each: [commentData], $position: 0 } } },
+        { returnDocument: 'after' }
       )
 
-    // console.log('🚀 ~ deleteManyByColumnId ~ result:', result)
     return result
   } catch (error) {
     throw new Error(error)
@@ -159,5 +156,5 @@ export const cardModel = {
   findOneById,
   update,
   deleteManyByColumnId,
-  destroyManyByColumnId
+  unshiftNewComment
 }

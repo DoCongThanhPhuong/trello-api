@@ -13,18 +13,14 @@ const createNew = async (req, res, next) => {
 const update = async (req, res, next) => {
   try {
     const cardId = req.params.cardId
-
-    if (req.body.comment) {
-      const { uid, email, picture, name } = res.locals
-      Object.assign(req.body.comment, {
-        userId: uid,
-        userEmail: email,
-        userAvatar: picture,
-        userDisplayName: name
-      })
-    }
-
-    const updatedCard = await cardService.update(cardId, req.body)
+    const cardCover = req.file
+    const userInfo = req.jwtDecoded
+    const updatedCard = await cardService.update(
+      cardId,
+      req.body,
+      cardCover,
+      userInfo
+    )
     res.status(StatusCodes.OK).json(updatedCard)
   } catch (error) {
     next(error)

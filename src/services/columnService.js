@@ -28,10 +28,9 @@ const createNew = async (reqBody) => {
 
 const update = async (columnId, reqBody) => {
   try {
-    const updateData = {
-      ...reqBody,
-      updatedAt: Date.now()
-    }
+    const column = await columnModel.findOneById(columnId)
+    if (!column) throw new ApiError(StatusCodes.NOT_FOUND, 'COLUMN::NOT_FOUND')
+    const updateData = { ...reqBody, updatedAt: Date.now() }
     const updatedColumn = await columnModel.update(columnId, updateData)
 
     return updatedColumn
@@ -50,7 +49,7 @@ const deleteItem = async (columnId) => {
     // delete the column
     await columnModel.deleteOneById(columnId)
     // delete the cards in this column
-    await cardModel.destroyManyByColumnId(columnId)
+    await cardModel.deleteManyByColumnId(columnId)
     // remove the columnId from the columnOrderIds of the board
     await boardModel.pullColumnOrderIds(targetColumn)
 

@@ -6,6 +6,7 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { cardModel } from './cardModel'
 import { columnModel } from './columnModel'
 import { pagingSkipValue } from '~/utils/algorithms'
+import { userModel } from './userModel'
 
 // Define Collection (name & schema)
 const BOARD_COLLECTION_NAME = 'boards'
@@ -13,7 +14,9 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(3).max(50).trim(),
   slug: Joi.string().required().min(3).trim(),
   description: Joi.string().required().min(3).max(255).trim(),
-  type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
+  type: Joi.string()
+    .valid(...Object.values(BOARD_TYPES))
+    .required(),
   columnOrderIds: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),
@@ -99,6 +102,24 @@ const getDetails = async (userId, boardId) => {
           }
         },
         {
+          $lookup: {
+            from: userModel.USER_COLLECTION_NAME,
+            localField: 'ownerIds',
+            foreignField: '_id',
+            as: 'owners',
+            pipeline: [{ $project: { password: 0, verifyToken: 0 } }]
+          }
+        },
+        {
+          $lookup: {
+            from: userModel.USER_COLLECTION_NAME,
+            localField: 'memberIds',
+            foreignField: '_id',
+            as: 'members',
+            pipeline: [{ $project: { password: 0, verifyToken: 0 } }]
+          }
+        },
+        {
           $addFields: {
             columns: {
               $filter: {
@@ -112,6 +133,20 @@ const getDetails = async (userId, boardId) => {
                 input: '$cards',
                 as: 'card',
                 cond: { $eq: ['$$card._destroy', false] }
+              }
+            },
+            owners: {
+              $filter: {
+                input: '$owners',
+                as: 'owner',
+                cond: { $eq: ['$$owner._destroy', false] }
+              }
+            },
+            members: {
+              $filter: {
+                input: '$members',
+                as: 'member',
+                cond: { $eq: ['$$member._destroy', false] }
               }
             }
           }
@@ -243,6 +278,22 @@ const listUserBoards = async (userId, page, size) => {
   }
 }
 
+const pushMemberIds = async (boardId, userId) => {
+  try {
+    const result = await GET_DB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        { _id: new ObjectId(boardId) },
+        { $push: { memberIds: new ObjectId(userId) } },
+        { returnDocument: 'after' }
+      )
+
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -252,5 +303,6 @@ export const boardModel = {
   pushColumnOrderIds,
   pullColumnOrderIds,
   update,
-  listUserBoards
+  listUserBoards,
+  pushMemberIds
 }

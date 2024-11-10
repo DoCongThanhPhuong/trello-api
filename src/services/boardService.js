@@ -48,6 +48,8 @@ const getDetails = async (userId, boardId) => {
 
 const update = async (boardId, reqBody) => {
   try {
+    const board = await boardModel.findOneById(boardId)
+    if (!board) throw new ApiError(StatusCodes.NOT_FOUND, 'BOARD::NOT_FOUND')
     const updateData = {
       ...reqBody,
       updatedAt: Date.now()

@@ -10,13 +10,15 @@ const createNew = async (req, res, next) => {
       // Custom error messages với Joi
       'any.required': 'Title is required',
       'string.empty': 'Title is not allowed to be empty',
-      'string.min': 'Title length must be at least one character long',
+      'string.min': 'Title length must be at least three characters long',
       'string.max':
         'Title length must be less than or equal to 50 characters long',
       'string.trim': 'Title must not have leading or trailing whitespace'
     }),
     description: Joi.string().required().min(3).max(255).trim(),
-    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
+    type: Joi.string()
+      .valid(...Object.values(BOARD_TYPES))
+      .required()
   })
 
   try {
@@ -41,7 +43,7 @@ const update = async (req, res, next) => {
     // Lưu ý: Không dùng required() trong trường hợp update
     title: Joi.string().min(1).max(50).trim(),
     description: Joi.string().min(3).max(255).trim(),
-    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE),
+    type: Joi.string().valid(...Object.values(BOARD_TYPES)),
     columnOrderIds: Joi.array().items(
       Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
     )

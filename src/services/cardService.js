@@ -1,6 +1,8 @@
-import { v2 as cloudinary } from 'cloudinary'
+import { StatusCodes } from 'http-status-codes'
 import { cardModel } from '~/models/cardModel'
 import { columnModel } from '~/models/columnModel'
+import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
+import ApiError from '~/utils/ApiError'
 
 const createNew = async (reqBody) => {
   try {
@@ -18,29 +20,31 @@ const createNew = async (reqBody) => {
   }
 }
 
-const update = async (cardId, reqBody) => {
+const update = async (cardId, reqBody, cardCover, userInfo) => {
   try {
     const card = await cardModel.findOneById(cardId)
-    const updateData = { ...reqBody }
-
-    if (reqBody.comment) {
-      reqBody.comment.updatedAt = Date.now()
-      updateData.comments = [...card.comments, reqBody.comment]
-      delete updateData.comment
-    }
-
-    if (reqBody.cover) {
-      if (card.cover) {
-        const imgId = card.cover.split('/').pop().split('.')[0]
-        await cloudinary.uploader.destroy(imgId)
+    if (!card) throw new ApiError(StatusCodes.NOT_FOUND, 'CARD::NOT_FOUND')
+    const updateData = { ...reqBody, updatedAt: Date.now() }
+    let updatedCard = {}
+    if (cardCover) {
+      const uploadResult = await CloudinaryProvider.streamUpload(
+        cardCover.buffer,
+        'card-covers'
+      )
+      updatedCard = await cardModel.update(cardId, {
+        cover: uploadResult.secure_url
+      })
+    } else if (updateData.commentToAdd) {
+      const commentData = {
+        ...updateData.commentToAdd,
+        commentedAt: Date.now(),
+        userId: userInfo._id,
+        userEmail: userInfo.email
       }
-      const uploadedResponse = await cloudinary.uploader.upload(reqBody.cover)
-      updateData.cover = uploadedResponse.secure_url
+      updatedCard = await cardModel.unshiftNewComment(cardId, commentData)
+    } else {
+      updatedCard = await cardModel.update(cardId, updateData)
     }
-
-    updateData.updatedAt = Date.now()
-
-    const updatedCard = await cardModel.update(cardId, updateData)
 
     return updatedCard
   } catch (error) {

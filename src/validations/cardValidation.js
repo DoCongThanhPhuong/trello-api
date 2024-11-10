@@ -29,10 +29,12 @@ const createNew = async (req, res, next) => {
 const update = async (req, res, next) => {
   const correctCondition = Joi.object({
     title: Joi.string().min(1).max(50).trim(),
-    cover: Joi.string().uri(),
-    memberIds: Joi.array().items(Joi.string()),
-    comment: Joi.object({
-      content: Joi.string().required().min(1).max(500).trim()
+    description: Joi.string().allow('').optional(),
+    commentToAdd: Joi.object({
+      userAvatar: Joi.string().allow(null).optional(),
+      userDisplayName: Joi.string().required(),
+      content: Joi.string().required().trim(),
+      commentedAt: Joi.date().timestamp()
     })
   })
 

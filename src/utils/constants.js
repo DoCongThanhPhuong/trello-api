@@ -13,3 +13,11 @@ export const WEBSITE_DOMAIN =
     : 'http://localhost:5173'
 
 export const DEFAULT_PAGE_SIZE = 12
+
+export const INVITATION_TYPES = { BOARD_INVITATION: 'BOARD_INVITATION' }
+
+export const BOARD_INVITATION_STATUS = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED'
+}
