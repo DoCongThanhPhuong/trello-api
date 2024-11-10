@@ -88,14 +88,15 @@ const moveCardToDifferentColumn = async (reqBody) => {
   }
 }
 
-const listUserBoards = async (userId, page, size) => {
+const listUserBoards = async (userId, page, size, queryFilters) => {
   try {
     if (!page) page = 1
     if (!size) size = DEFAULT_PAGE_SIZE
     const results = await boardModel.listUserBoards(
       userId,
       parseInt(page, 10),
-      parseInt(size, 10)
+      parseInt(size, 10),
+      queryFilters
     )
     return results
   } catch (error) {

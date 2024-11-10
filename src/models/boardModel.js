@@ -118,38 +118,6 @@ const getDetails = async (userId, boardId) => {
             as: 'members',
             pipeline: [{ $project: { password: 0, verifyToken: 0 } }]
           }
-        },
-        {
-          $addFields: {
-            columns: {
-              $filter: {
-                input: '$columns',
-                as: 'column',
-                cond: { $eq: ['$$column._destroy', false] }
-              }
-            },
-            cards: {
-              $filter: {
-                input: '$cards',
-                as: 'card',
-                cond: { $eq: ['$$card._destroy', false] }
-              }
-            },
-            owners: {
-              $filter: {
-                input: '$owners',
-                as: 'owner',
-                cond: { $eq: ['$$owner._destroy', false] }
-              }
-            },
-            members: {
-              $filter: {
-                input: '$members',
-                as: 'member',
-                cond: { $eq: ['$$member._destroy', false] }
-              }
-            }
-          }
         }
       ])
       .toArray()
@@ -237,7 +205,7 @@ const update = async (boardId, updateData) => {
   }
 }
 
-const listUserBoards = async (userId, page, size) => {
+const listUserBoards = async (userId, page, size, queryFilters) => {
   try {
     const queryConditions = [
       { _destroy: false },
@@ -248,6 +216,18 @@ const listUserBoards = async (userId, page, size) => {
         ]
       }
     ]
+
+    if (queryFilters) {
+      Object.keys(queryFilters).forEach((key) => {
+        // Có phân biệt chữ hoa - chữ thường
+        // queryConditions.push({ [key]: { $regex: queryFilters[key] } })
+        // Không phân biệt chữ hoa - chữ thường
+        queryConditions.push({
+          [key]: { $regex: new RegExp(queryFilters[key], 'i') }
+        })
+      })
+    }
+
     const query = await GET_DB()
       .collection(BOARD_COLLECTION_NAME)
       .aggregate(
